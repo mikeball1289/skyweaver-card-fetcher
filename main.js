@@ -5,6 +5,20 @@ const fetch = require('node-fetch');
 let cacheTime = new Date(0);
 let cardMap = undefined;
 
+const costMap = {
+    [-1]: '<:xc:611596484445470753>',
+    [0]: '<:0c:611596016478716083>',
+    [1]: '<:1c:611594980737286149>',
+    [2]: '<:2c:611594980833624074>',
+    [3]: '<:3c:611594980775034882>',
+    [4]: '<:4c:611594980984619008>',
+    [5]: '<:5c:611594980489822211>',
+    [6]: '<:6c:611594980678696980>',
+    [7]: '<:7c:611594980628234240>',
+    [8]: '<:8c:611594980510924832>',
+    [9]: '<:9c:611594980582227982>',
+};
+
 async function fetchCardList() {
     if (cacheTime > new Date()) return;
     const cards = await fetch('http://www.skyweavermeta.com/trigger/cardData.json').then(d => d.json());
@@ -15,6 +29,7 @@ async function fetchCardList() {
             name: cards[id].name,
             keywords: cards[id].keywords.map(w => w[0] + w.slice(1).toLowerCase()),
             description: cards[id].description,
+            cost: cards[id].manaCost,
             stats: `${cards[id].power}/${cards[id].health}`,
             type: cards[id].type,
         };
@@ -42,7 +57,7 @@ client.on('message', async msg => {
         if (cardData.length > 0) {
             for (const data of cardData) {
                 const embed = new Discord.MessageEmbed()
-                    .setTitle(data.name)
+                    .setTitle(`(${data.cost < 0 ? 'X' : data.cost}) ${data.name}`)
                     .setURL(data.image)
                     .setDescription(data.keywords.join(', ') + '\n' + data.description + (data.type === 'UNIT' ? ('\n' + data.stats) : ''))
                     .setThumbnail(data.image);
