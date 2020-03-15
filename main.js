@@ -34,7 +34,7 @@ async function fetchCardList() {
             type: cards[id].type,
         };
     }
-    cacheTime = new Date(Date.now() - (1000 * 60 * 60));
+    cacheTime = new Date(Date.now() + (1000 * 60 * 60));
 }
 
 client.on('ready', async () => {
