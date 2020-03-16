@@ -72,4 +72,4 @@ client.on('message', async msg => {
     }
 });
 
-client.login(fs.readFileSync('private.key', 'ascii'));
+client.login(fs.readFileSync('private.key', 'ascii').trim());
