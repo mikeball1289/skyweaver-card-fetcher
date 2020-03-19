@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const fetch = require('node-fetch');
+const fs = require('fs');
 
 let cacheTime = new Date(0);
 let cardMap = undefined;
@@ -67,4 +68,4 @@ client.on('message', async msg => {
     }
 });
 
-client.login('Njg4NDU2MzEzNTk5OTUwOTky.Xm0nSg.ICK8pEiCBxdpmLf0P9GPyu3EQK0');
+client.login(fs.readFileSync('private.key', 'ascii').trim());

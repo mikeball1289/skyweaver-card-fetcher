@@ -1,1 +1,6 @@
+<<<<<<< HEAD
 node_modules/
+=======
+node_modules/
+private.key
+>>>>>>> f0efb4a278ce2e79fc6de37dd375b6b383b80ddd
