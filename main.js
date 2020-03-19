@@ -53,11 +53,11 @@ client.on('message', async msg => {
             response.push(match[1].toLowerCase().replace(/[^a-z]/g, ''));
         } while (match = regex.exec(msg.content));
 
-        const cardData = response.map(cn => cardMap[cn]).filter(ci => ci);
+        const cardData = response.map(cn => cardMap[cn]).filter(ci => ci).slice(0, 5); // only take the first 5 cards
         if (cardData.length > 0) {
             for (const data of cardData) {
                 const embed = new Discord.MessageEmbed()
-                    .setTitle(`(${data.cost < 0 ? 'X' : data.cost}) ${data.name}`)
+                    .setTitle(`${costMap[data.cost]} ${data.name}`)
                     .setURL(data.image)
                     .setDescription(data.keywords.join(', ') + '\n' + data.description + (data.type === 'UNIT' ? ('\n' + data.stats) : ''))
                     .setThumbnail(data.image);
