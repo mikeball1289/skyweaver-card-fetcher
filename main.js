@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 const fetch = require('node-fetch');
 const fs = require('fs');
+const crypto = require('crypto');
 
 let cacheTime = new Date(0);
 let cardMap = undefined;
@@ -59,9 +60,9 @@ client.on('message', async msg => {
             for (const data of cardData) {
                 const embed = new Discord.MessageEmbed()
                     .setTitle(`${costMap[data.cost]} ${data.name}`)
-                    .setURL(data.image)
+                    .setURL(data.image) // append a cache buster to the image
                     .setDescription(data.keywords.join(', ') + '\n' + data.description + (data.type === 'UNIT' ? ('\n' + data.stats) : ''))
-                    .setThumbnail(data.image);
+                    .setThumbnail(`${data.image}?${crypto.randomBytes(16).toString('hex')}`);
                 msg.channel.send(embed);
             }
         }
