@@ -1,13 +1,18 @@
-const Discord = require('discord.js');
+import * as Discord from 'discord.js';
+import fetch from 'node-fetch';
+import * as fs from 'fs';
+import * as crypto from 'crypto';
+import * as path from 'path';
+import { CardMap, CardData } from './types';
+import { generateDeckList } from './deckPreview';
+
 const client = new Discord.Client();
-const fetch = require('node-fetch');
-const fs = require('fs');
-const crypto = require('crypto');
 
 let cacheTime = new Date(0);
-let cardMap = undefined;
+let cardMap: CardMap;
+let rawCache: CardData;
 
-const costMap = {
+const costMap: { [cost: number]: string } = {
     [-1]: '<:xc:611596484445470753>',
     [0]: '<:0c:611596016478716083>',
     [1]: '<:1c:611594980737286149>',
@@ -26,12 +31,13 @@ const costMap = {
 async function fetchCardList() {
     if (cacheTime > new Date()) return;
     const cards = await fetch('http://www.skyweavermeta.com/trigger/cardData.json').then(d => d.json());
+    rawCache = cards;
     cardMap = {};
     for (const id in cards) {
         cardMap[cards[id].name.toLowerCase().replace(/[^a-z]/g, '')] = {
             image: cards[id].imageURL.medium,
             name: cards[id].name,
-            keywords: cards[id].keywords.map(w => w[0] + w.slice(1).toLowerCase()),
+            keywords: cards[id].keywords.map((w: string) => w[0] + w.slice(1).toLowerCase()),
             description: cards[id].description,
             cost: cards[id].manaCost,
             stats: `${cards[id].power}/${cards[id].health}`,
@@ -42,6 +48,7 @@ async function fetchCardList() {
 }
 
 client.on('ready', async () => {
+    if (!client.user) throw new Error('Failed to log in');
     console.log(`Logged in as ${client.user.tag}!`);
     await fetchCardList();
 });
@@ -49,6 +56,7 @@ client.on('ready', async () => {
 const regex = /\{\{(.+?)\}\}/g;
 
 client.on('message', async msg => {
+    if (!msg.content || !msg.channel) return;
     let match = regex.exec(msg.content);
     if (match) {
         await fetchCardList();
@@ -68,7 +76,13 @@ client.on('message', async msg => {
                 msg.channel.send(embed);
             }
         }
+    } else if (msg.content.startsWith('!deck ')) {
+        await fetchCardList();
+        const deckstring = msg.content.replace('!deck ', '');
+        const reply = generateDeckList(deckstring, rawCache);
+        if (!reply) return;
+        msg.channel.send(`<${reply.url}>\n${reply.cards.join(', ')}`);
     }
 });
 
-client.login(fs.readFileSync('private.key', 'ascii').trim());
+client.login(fs.readFileSync(path.join(__dirname, '..', 'private.key'), 'ascii').trim());
