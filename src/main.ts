@@ -78,7 +78,9 @@ client.on('message', async msg => {
         }
     } else if (msg.content.startsWith('!deck ') || msg.content.startsWith('!deck\n')) {
         await fetchCardList();
-        const deckstring = msg.content.replace('!deck ', '');
+        const deckstring = msg.content.replace('\n', ' ').replace('!deck ', '');
+        console.log(msg);
+        console.log(deckstring);
         const reply = generateDeckList(deckstring, rawCache);
         if (!reply) return;
         msg.channel.send(`<${reply.url}>\n${reply.cards.join(', ')}`);
