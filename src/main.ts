@@ -76,7 +76,7 @@ client.on('message', async msg => {
                 msg.channel.send(embed);
             }
         }
-    } else if (msg.content.startsWith('!deck ')) {
+    } else if (msg.content.startsWith('!deck ') || msg.content.startsWith('!deck\n')) {
         await fetchCardList();
         const deckstring = msg.content.replace('!deck ', '');
         const reply = generateDeckList(deckstring, rawCache);
