@@ -1,0 +1,66 @@
+html
+  head
+    link(href='https://fonts.googleapis.com/css?family=Barlow Condensed' rel='stylesheet')
+    style.
+      body {
+        width: #{220 * width}px;
+        height: #{40 * Math.ceil(cards.length / width)}px;
+        background: rgb(35, 20, 69);
+      }
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      .card-container {
+        display: inline-block;
+        position: relative;
+        width: 218px;
+        height: 38px;
+        line-height: 40px;
+        background: rgb(35, 20, 69);
+        border: 1px solid rgb(108, 92, 167);
+      }
+      .card-image {
+        object-fit: none;
+        width: 150px;
+        height: 38px;
+        object-position: center 18%;
+        display: block;
+        position: absolute;
+        right: 0;
+        -webkit-mask-image: linear-gradient(to left, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0));
+      }
+      .cost-box {
+        position: relative;
+        width: 30px;
+        height: 30px;
+        display: inline-block;
+        vertical-align: middle;
+        background-image: url(https://assets.skyweaver.net/INPCXG-y/webapp/icons/mana-gem.png);
+        background-size: cover;
+        margin-left: 5px;
+        margin-right: 5px;
+        text-align: center;
+        font-family: 'Barlow Condensed';
+        font-size: 22px;
+        line-height: 30px;
+      }
+      .card-name {
+        position: relative;
+        font-family: 'Barlow Condensed';
+        color: white;
+        font-size: 24px;
+        line-height: 37px;
+        vertical-align: middle;
+        text-shadow:
+          -1px -1px 0 black,
+          1px -1px 0 black,
+          -1px  1px 0 black,
+          1px  1px 0 black;
+      }
+  body
+    for card of cards
+      div.card-container
+        img.card-image(src=card.imageURL.medium)
+        div.cost-box=card.manaCost < 0 ? 'X' : card.manaCost
+        span.card-name=card.name

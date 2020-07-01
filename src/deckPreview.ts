@@ -1,5 +1,9 @@
+import nodeHtmlToImage from 'node-html-to-image';
+import pug from 'pug';
 import { CardData } from './types';
 import { decode } from 'bs58';
+import { join } from 'path';
+import { randomBytes } from 'crypto';
 
 export interface Deck {
     prisms: string;
@@ -25,6 +29,28 @@ export function generateDeckList(deckString: string, rawCards: CardData): DeckLi
     } catch (err) {
         return undefined;
     }
+}
+
+const render = pug.compileFile(join(__dirname, '..', 'templates', 'preview.pug'));
+
+export async function generateDeckListImage(deckString: string, rawCards: CardData): Promise<{ url: string, fileName: string } | undefined> {
+    const deck = parseDeckString(deckString);
+    if (!deck) return undefined;
+    if (deck.cardIds.length < 1 || deck.cardIds.length > 30) return undefined;
+    const url = `https://beta.skyweaver.net/items/deck/${deck.prisms}/${deckString}`;
+    const fileName = `./deckImages/image${randomBytes(16).toString('hex')}.png`;
+    const cards = deck.cardIds
+        .filter(id => id in rawCards)
+        .map(id => rawCards[id])
+        .sort((a, b) => a.manaCost - b.manaCost);
+
+    const html = render({ cards, width: Math.ceil(cards.length / 10) });
+    await nodeHtmlToImage({
+        output: fileName,
+        html,
+    });
+
+    return { url, fileName };
 }
 
 function parseDeckString(deckString: string): Deck | undefined {

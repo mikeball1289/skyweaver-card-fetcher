@@ -1,16 +1,13 @@
-import * as Discord from 'discord.js';
+import Discord from 'discord.js';
 import fetch from 'node-fetch';
-import * as fs from 'fs';
-import * as crypto from 'crypto';
-import * as path from 'path';
-import { CardMap, CardData } from './types';
-import { generateDeckList } from './deckPreview';
+import fs from 'fs';
+import crypto from 'crypto';
+import path from 'path';
+import { CardMap } from './types';
+import { generateDeckList, generateDeckListImage } from './deckPreview';
+import { Cacher } from './cache/Cacher';
 
 const client = new Discord.Client();
-
-let cacheTime = new Date(0);
-let cardMap: CardMap;
-let rawCache: CardData;
 
 const costMap: { [cost: number]: string } = {
     [-1]: '<:xc:611596484445470753>',
@@ -29,10 +26,8 @@ const costMap: { [cost: number]: string } = {
 };
 
 async function fetchCardList() {
-    if (cacheTime > new Date()) return;
     const cards = await fetch('http://www.skyweavermeta.com/trigger/cardData.json').then(d => d.json());
-    rawCache = cards;
-    cardMap = {};
+    const cardMap: CardMap = {};
     for (const id in cards) {
         cardMap[cards[id].name.toLowerCase().replace(/[^a-z]/g, '')] = {
             image: cards[id].imageURL.medium,
@@ -44,13 +39,16 @@ async function fetchCardList() {
             type: cards[id].type,
         };
     }
-    cacheTime = new Date(Date.now() + (1000 * 60 * 60));
+    return { cards, cardMap };
 }
+
+const cardCache = new Cacher(fetchCardList, 1000 * 60 * 60);
+// const cache = new Cacher(fetchCardList, 1000);
 
 client.on('ready', async () => {
     if (!client.user) throw new Error('Failed to log in');
     console.log(`Logged in as ${client.user.tag}!`);
-    await fetchCardList();
+    cardCache.get();
 });
 
 const regex = /\{\{(.+?)\}\}/g;
@@ -59,7 +57,7 @@ client.on('message', async msg => {
     if (!msg.content || !msg.channel) return;
     let match = regex.exec(msg.content);
     if (match) {
-        await fetchCardList();
+        const { cardMap } = await cardCache.get();
         let response = [];
         do {
             response.push(match[1].toLowerCase().replace(/[^a-z]/g, ''));
@@ -77,13 +75,16 @@ client.on('message', async msg => {
             }
         }
     } else if (msg.content.startsWith('!deck ') || msg.content.startsWith('!deck\n')) {
-        await fetchCardList();
+        const { cards } = await cardCache.get();
         const deckstring = msg.content.replace('\n', ' ').replace('!deck ', '');
-        console.log(msg);
-        console.log(deckstring);
-        const reply = generateDeckList(deckstring, rawCache);
+        const reply = await generateDeckListImage(deckstring, cards);
         if (!reply) return;
-        msg.channel.send(`<${reply.url}>\n${reply.cards.join(', ')}`);
+        const embed = new Discord.MessageEmbed()
+            .setTitle('Build this deck!')
+            .setURL(reply.url)
+            .attachFiles([reply.fileName])
+            .setImage(`attachment://${reply.fileName.split('/').slice(-1)[0]}`);
+        msg.channel.send(embed);
     }
 });
 
