@@ -1,4 +1,4 @@
 node_modules/
-private.key
+private.*
 bin/
 deckImages/*.png

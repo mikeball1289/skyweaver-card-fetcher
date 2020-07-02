@@ -6,11 +6,9 @@ Card fetching is case insensitive, and ignores all spacing and punctuation, so n
 
 If you wrap something that isn't a card name in double curly braces, SkyBot won't respond.
 
-This project is an MVP, it serves its basic purpose well but there's still a lot that can be done in terms of code structure and functionality.
+You can also link a decklist with the `!deck` command, with `!deck <deck code>`. It will generate an image preview of your decklist and post that along with a link to your deck in the in-game deck builder.
 
 ### TODO:
- - Convert to Typescript with a real project structure
- - Add a help command `{{!help}}` to link to this readme
  - Add search functionality, something like `{{!search|cost:1-5 power:>=1 lifesteal}}`
  - Large image support, `{{!broodwitch}}` would link a full sized image without the card description in the card
  - Price search `{{$broodwitch}}` returns the current market buy/sell price
