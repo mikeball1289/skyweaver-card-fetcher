@@ -4,7 +4,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import path from 'path';
 import { CardMap } from './types';
-import { generateDeckList, generateDeckListImage } from './deckPreview';
+import { generateDeckListImage } from './deckPreview';
 import { Cacher } from './cache/Cacher';
 
 const client = new Discord.Client();
