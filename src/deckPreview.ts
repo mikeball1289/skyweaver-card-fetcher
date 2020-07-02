@@ -10,30 +10,14 @@ export interface Deck {
     cardIds: number[];
 }
 
-export interface DeckList {
+export interface DeckListImageResult {
     url: string;
-    cards: string[];
-}
-
-export function generateDeckList(deckString: string, rawCards: CardData): DeckList | undefined {
-    const deck = parseDeckString(deckString);
-    if (!deck) return undefined;
-    try {
-        const url = `https://beta.skyweaver.net/items/deck/${deck.prisms}/${deckString}`;
-        const cards = deck.cardIds
-            .filter(id => id in rawCards)
-            .map(id => rawCards[id])
-            .sort((a, b) => a.manaCost - b.manaCost)
-            .map(card => `(${card.manaCost}) ${card.name}`);
-        return { url, cards };
-    } catch (err) {
-        return undefined;
-    }
+    fileName: string;
 }
 
 const render = pug.compileFile(join(__dirname, '..', 'templates', 'preview.pug'));
 
-export async function generateDeckListImage(deckString: string, rawCards: CardData): Promise<{ url: string, fileName: string } | undefined> {
+export async function generateDeckListImage(deckString: string, rawCards: CardData): Promise<DeckListImageResult | undefined> {
     const deck = parseDeckString(deckString);
     if (!deck) return undefined;
     if (deck.cardIds.length < 1 || deck.cardIds.length > 30) return undefined;
