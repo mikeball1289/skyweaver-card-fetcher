@@ -1,5 +1,4 @@
 import Discord from 'discord.js';
-import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 import { CardMap, CardData } from './types';
@@ -44,7 +43,7 @@ const actions: Action[] = [
 
 client.on('message', async msg => {
     try {
-        if (!msg.content || !msg.channel) return;
+        if (!msg.content || !msg.channel || !(msg.channel instanceof Discord.TextChannel)) return;
         for (const action of actions) {
             const trigger = await action.triggerData(msg.content);
             if (trigger) {

@@ -29,7 +29,7 @@ export class CardLookupAction implements Action {
         return message.match(cardFetchRegex)?.slice();
     }
 
-    async process(params: string[], channel: Discord.TextChannel | Discord.DMChannel) {
+    async process(params: string[], channel: Discord.TextChannel) {
         const { cardMap } = await this.cardCache.get();
 
         const messages = params

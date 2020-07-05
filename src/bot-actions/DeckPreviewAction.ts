@@ -23,7 +23,7 @@ export class DeckPreviewAction implements Action {
         return message.match(deckPreviewRegex)?.slice();
     }
 
-    async process(params: string[], channel: Discord.TextChannel | Discord.DMChannel) {
+    async process(params: string[], channel: Discord.TextChannel) {
         const { cards } = await this.cardCache.get();
         const deckstring = params[0];
         const reply = await generateDeckListImage(deckstring, cards);
