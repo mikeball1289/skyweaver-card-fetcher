@@ -56,4 +56,4 @@ client.on('message', async msg => {
     }
 });
 
-client.login(fs.readFileSync(path.join(__dirname, '..', 'private.key.bak'), 'ascii').trim());
+client.login(fs.readFileSync(path.join(__dirname, '..', 'private.key'), 'ascii').trim());
