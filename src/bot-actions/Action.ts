@@ -4,5 +4,5 @@ type TriggerDataResult = string[] | undefined;
 
 export interface Action {
     triggerData(message: string): TriggerDataResult | Promise<TriggerDataResult>;
-    process(params: string[], channel: Discord.TextChannel): void | Promise<void>;
+    process(params: string[], channel: Discord.TextChannel | Discord.DMChannel): void | Promise<void>;
 }

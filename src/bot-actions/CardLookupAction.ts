@@ -1,7 +1,7 @@
 import Discord from 'discord.js';
 import { Action } from './Action';
 import { Cacher } from '../cache/Cacher';
-import { CardData, CardMap } from '../types';
+import { CardData, CardMap, MiniCard } from '../types';
 import { randomBytes } from 'crypto';
 
 const costMap: { [cost: number]: string } = {
@@ -29,13 +29,13 @@ export class CardLookupAction implements Action {
         return message.match(cardFetchRegex)?.slice();
     }
 
-    async process(params: string[], channel: Discord.TextChannel) {
+    async process(params: string[], channel: Discord.TextChannel | Discord.DMChannel) {
         const { cardMap } = await this.cardCache.get();
 
         const messages = params
             .map(cn => cn.toLowerCase().replace(/[^a-z]/g, ''))
-            .map(cn => cardMap[cn])
-            .filter(ci => ci)
+            .map(cn => lookupCard(cn, cardMap))
+            .filter((ci): ci is MiniCard => ci != null)
             .slice(0, 5) // only take the first 5 cards
             .map(data => new Discord.MessageEmbed()
                 .setTitle(`${costMap[data.cost]} ${data.name}`)
@@ -47,4 +47,24 @@ export class CardLookupAction implements Action {
             channel.send(message);
         }
     }
+}
+
+function lookupCard(cardName: string, cardMap: CardMap) {
+    if (cardName in cardMap) return cardMap[cardName];
+    const names = Object.keys(cardMap);
+    const match = new RegExp(cardName.split('').join('.*?'));
+    const best = names
+        .map(n => pair(n, n.match(match)))
+        .filter((v): v is [string, RegExpMatchArray] => v[1] != null)
+        .sort((a, b) => a[1][0].length - b[1][0].length)[0];
+    
+    if (best != null) {
+        return cardMap[best[0]];
+    } else {
+        return null;
+    }
+}
+
+function pair<T, U>(t: T, u: U): [T, U] {
+    return [t, u];
 }
