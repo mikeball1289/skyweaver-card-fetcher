@@ -43,7 +43,7 @@ const actions: Action[] = [
 
 client.on('message', async msg => {
     try {
-        if (!msg.content || !msg.channel) return;
+        if (!msg.content || !msg.channel || msg.channel instanceof Discord.NewsChannel) return;
         for (const action of actions) {
             const trigger = await action.triggerData(msg.content);
             if (trigger) {

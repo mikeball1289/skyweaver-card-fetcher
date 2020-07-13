@@ -14,13 +14,15 @@
     "forever": "^3.0.0",
     "node-fetch": "^2.6.0",
     "node-html-to-image": "^2.1.1",
-    "pug": "^3.0.0"
+    "pug": "^3.0.0",
+    "typescript": "^3.9.6"
   },
   "devDependencies": {},
   "scripts": {
     "build": "tsc -p .",
     "start": "node bin/main",
-    "forever": "forever start bin/main.js"
+    "daemon:start": "forever start bin/main.js",
+    "daemon:restart": "forever restart bin/main.js"
   },
   "author": "",
   "license": "ISC"
