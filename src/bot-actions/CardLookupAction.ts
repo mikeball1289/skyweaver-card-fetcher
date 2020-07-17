@@ -3,6 +3,8 @@ import { Action } from './Action';
 import { Cacher } from '../cache/Cacher';
 import { CardData, CardMap, MiniCard } from '../types';
 import { randomBytes } from 'crypto';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 const costMap: { [cost: number]: string } = {
     [-1]: '<:xc:611596484445470753>',
@@ -21,6 +23,8 @@ const costMap: { [cost: number]: string } = {
 };
 
 const cardFetchRegex = /(?<=\{\{).+?(?=\}\})/g;
+
+const easterEggs = readFileSync(join(__dirname, '..', '..', 'easterEggs.txt'), 'ascii').split(/\r?\n/).map(l => l.split(',') as [string, string]);
 
 export class CardLookupAction implements Action {
     constructor(private cardCache: Cacher<{ cards: CardData, cardMap: CardMap }>) { }
@@ -50,7 +54,10 @@ export class CardLookupAction implements Action {
 }
 
 function lookupCard(cardName: string, cardMap: CardMap) {
+    const easterEgg = easterEggs.find(ee => ee[0] === cardName)?.[1];
+
     if (cardName in cardMap) return cardMap[cardName];
+    if (easterEgg && easterEgg in cardMap) return cardMap[easterEgg];
     const names = Object.keys(cardMap);
     const match = new RegExp(cardName.split('').join('.*?'));
     const best = names
