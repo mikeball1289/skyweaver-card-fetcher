@@ -8,7 +8,6 @@ If you wrap something that isn't a card name in double curly braces, SkyBot won'
 
 You can also link a decklist with the `!deck` command, with `!deck <deck code>`. It will generate an image preview of your decklist and post that along with a link to your deck in the in-game deck builder.
 
-### TODO:
- - Add search functionality, something like `{{!search|cost:1-5 power:>=1 lifesteal}}`
- - Large image support, `{{!broodwitch}}` would link a full sized image without the card description in the card
- - Price search `{{$broodwitch}}` returns the current market buy/sell price
+# Deployment
+
+To deploy, create a build with `npm run build` and put your discord developer key in a file named `private.key` in the root of this project (this file is .gitignored so you don't accidentally commit it!). Once built, start with `npm start` to start in a node process, or use `npm run daemon:start` to daemonize with `forever`.

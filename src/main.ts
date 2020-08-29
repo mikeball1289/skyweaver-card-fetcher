@@ -7,6 +7,7 @@ import { CardLookupAction } from './bot-actions/CardLookupAction';
 import { DeckPreviewAction } from './bot-actions/DeckPreviewAction';
 import { Action } from './bot-actions/Action';
 import { getCards } from './net/getCards';
+import { InfoAction } from './bot-actions/InfoAction';
 
 const client = new Discord.Client();
 
@@ -39,6 +40,7 @@ client.on('ready', async () => {
 const actions: Action[] = [
     new CardLookupAction(cardCache),
     new DeckPreviewAction(cardCache),
+    new InfoAction(),
 ];
 
 client.on('message', async msg => {
